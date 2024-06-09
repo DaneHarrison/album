@@ -1,49 +1,38 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { IoMdArrowBack } from "react-icons/io";
 import { IoMdArrowForward } from "react-icons/io";
 
-import Globe from 'globe.gl';
+import { MapView, MAP_VIEW } from './views/mapView';
+import { GlobeView, GLOBE_VIEW } from './views/globeView';
 
 
-function App() {
-  const [year, setYear] = useState<number | null>(null);
+export default function App() {
+    const [year, setYear] = useState<number>(new Date().getFullYear());
+    const [currView, setCurrView] = useState<string>(GLOBE_VIEW);
 
-  useEffect(() => {
-    setYear(new Date().getFullYear())
-
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight * 0.9;
-
-    const world = Globe({ animateIn: true, waitForGlobeReady: true })
-      (document.getElementById('globe')!)
-        .globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
-        .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
-        .backgroundColor('#9FE2BF')
-        .width(viewportWidth)
-        .height(viewportHeight)
-        .pointOfView({ lat: 39.6, lng: -98.5, altitude: 1.5 });
-  
-    world.controls().autoRotate = true;
-    world.controls().autoRotateSpeed = 0.35;
-  }, [])
+    function swapView(view: string, zoomLvl: number) {
+        if (view === GLOBE_VIEW && zoomLvl === 0.8) {
+            setCurrView(MAP_VIEW)
+        }
+        else if (view === MAP_VIEW && zoomLvl == 2) {
+            setCurrView(GLOBE_VIEW)
+        }
+    }
 
 
-  function changeYear(adjustment: any) {
-    setYear((prev: any) => prev + adjustment)
-  }
+    return (
+        <>
+            <header className='absolute top-0 left-0 z-20 w-screen bg-transparent'>
+                <div className='flex justify-center gap-4 h-[10vh]'>
+                    <button onClick={() => setYear((prev) => prev - 1)}><IoMdArrowBack className='size-8 text-charcoal' /></button>
+                    <h1 className='text-6xl text-sage-green'>Year: {year}</h1>
+                    <button onClick={() => setYear((prev) => prev + 1)}><IoMdArrowForward className='size-8 text-charcoal' /></button>
+                </div>
+            </header>
 
 
-  return (
-    <>
-      <header className='flex justify-center gap-4 border-b-2 border-black h-[10vh]'>
-        <button onClick={() => changeYear(-1)}><IoMdArrowBack className='size-8 text-charcoal'/></button>
-        <h1 className= 'text-6xl text-sage-green'>Year: {year}</h1>
-        <button onClick={() => changeYear(1)}><IoMdArrowForward className= 'size-8 text-charcoal'/></button>
-      </header>
-      
-      <div id="globe"/>
-    </>
-  );
+            <GlobeView currView={currView} swapView={swapView} />
+            <MapView swapView={swapView} />
+        </>
+    );
 }
-
-export default App;
