@@ -4,7 +4,7 @@ import { IoMdArrowForward } from "react-icons/io";
 
 import { MapView, MAP_VIEW } from './views/mapView';
 import { GlobeView, GLOBE_VIEW } from './views/globeView';
-
+import FLOWER from './assets/test.json'
 
 export default function App() {
     const [year, setYear] = useState<number>(new Date().getFullYear());
@@ -31,7 +31,7 @@ export default function App() {
             </header>
 
 
-            <GlobeView currView={currView} swapView={swapView} />
+            <GlobeView FLOWER={FLOWER} currView={currView} swapView={swapView} />
             <MapView swapView={swapView} />
         </>
     );

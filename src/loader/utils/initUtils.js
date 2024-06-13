@@ -1,18 +1,21 @@
 
-import { readdirSync, writeFileSync } from 'fs';
+const { readdirSync, writeFileSync, readFileSync } = require('fs');
 
 // EXIF metadata can only be associated with JPEG/JPG images
 const IMAGE_FILTER = /\.(jpg|jpeg)$/i
 
 
-export function loadImages(pathToImages: string) {
+function loadImages(pathToImages) {
     const images = [];
 
     try {
         const files = readdirSync(pathToImages)
             .filter((file) => IMAGE_FILTER.test(file));
 
-        images.push(...files)
+        for(const currFile of files) {
+            const fileData = readFileSync(`${pathToImages}/${currFile}`, {encoding: 'base64'})
+            images.push(fileData)
+        }
     } catch (err) {
         console.error('[ERROR]: ', err);
     }
@@ -20,7 +23,7 @@ export function loadImages(pathToImages: string) {
     return images
 }
 
-export function formatNumberWithDecimal(number: number) {
+function formatNumberWithDecimal(number) {
     let formattedNumber = number.toFixed(1);
     
     if (!formattedNumber.includes('.')) {
@@ -30,6 +33,12 @@ export function formatNumberWithDecimal(number: number) {
     return parseFloat(formattedNumber);
 }
 
-export function exportJSONToFile(jsonData: any, outputFilename: string="test.json") {
+function exportJSONToFile(jsonData, outputFilename="test.json") {
     writeFileSync(outputFilename, jsonData);
+}
+
+module.exports = {
+    exportJSONToFile,
+    formatNumberWithDecimal,
+    loadImages
 }

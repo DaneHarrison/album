@@ -15,7 +15,6 @@ export type GeoImage = {
 }
 
 export type GeoMappings = {
-    coords: Coords
     geoImageCount: number
-    geoImages: []
+    geoImages: string[]
 }
