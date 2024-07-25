@@ -1,19 +1,24 @@
 import classNames from 'classnames';
 import Globe, { GlobeInstance } from 'globe.gl';
 import { useEffect, useRef } from 'react';
-import { IoMdArrowBack } from "react-icons/io";
+import { GeoImage, GeoMappings } from '../types';
 
 interface props {
     currView: string
     swapView: (view: string, zoomLvl: number) => any
-    FLOWER: any
+    geoMappings: Record<string, GeoMappings>
+    geoImages: GeoImage[]
 }
 
-
 export const GLOBE_VIEW = 'globe'
-export const GLOBE_MAX_ZOOM = 0
+export const MIN_GLOBE_ZOOM = 1.5 // any less, and it has no effect on markers
+export const MAX_GLOBE_ZOOM = 0.8 // switches to the map view when reached
+export const MIN_X_GROUPS = 360   // i.e each LONG has all its markers grouped
+export const MAX_X_GROUPS = 3600  // i.e 0.1th of each LONG has its markers grouped
+export const MIN_Y_GROUPS = 180   // i.e each LAT has all its markers grouped
+export const MAX_Y_GROUPS = 1800  // i.e 0.1th of each LAT has its markers grouped
 
-export const GlobeView = ({ FLOWER, currView, swapView }: props) => {
+export const GlobeView = ({ geoMappings, geoImages, currView, swapView }: props) => {
     const globeDivRef = useRef(null);
 
     let globe: GlobeInstance;
@@ -42,8 +47,6 @@ export const GlobeView = ({ FLOWER, currView, swapView }: props) => {
         globe.controls().minDistance = 180;
         globe.controls().maxDistance = 300;
 
-        MARKERS()
-
         globe.onZoom((chords) => {
             if (chords.altitude === 0.8) {
                 globe.controls().autoRotate = false;
@@ -56,7 +59,7 @@ export const GlobeView = ({ FLOWER, currView, swapView }: props) => {
     function MARKERS() {
         const markers = [] as any[]
 
-        FLOWER.forEach((flower: any) => markers.push({
+        geoImages.forEach((img) => markers.push({
             lat: 62.8084,
             lng: -92.0853,
             size: 10,
@@ -66,7 +69,7 @@ export const GlobeView = ({ FLOWER, currView, swapView }: props) => {
         return markers
     }
 
-    const markerSvg = `<img className='w-4 h-4' src='./photos/barak.jpg'/>`
+    const markerSvg = `<img className='w-4 h-4' src='data:image/jpeg;base64,${geoImages[0]['base64Img']}'/>`
 
     return (
         <div ref={globeDivRef} className={classNames(currView === GLOBE_VIEW && 'z-10', 'fixed top-0 left-0 h-[100vh] w-[100vw]')} />

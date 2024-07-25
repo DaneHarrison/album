@@ -1,20 +1,26 @@
-export type Coords = {
+export interface Coords {
     x: number
     y: number
 }
 
-export type GeoPath = {
+export interface GeoPath {
     date: Date
-    cords: Coords    
+    coords: Coords[]
 }
 
-export type GeoImage = {
-    date: Date
-    cords: Coords
+export interface GeoImage extends Coords {
+    id: number
+    date?: Date
     base64Img: string
 }
 
-export type GeoMappings = {
-    geoImageCount: number
-    geoImages: string[]
+export interface GeoMapping {
+    geoImgCount: number
+    geoImgIDs: number[]
 }
+
+export type GeoMarker = Record<string, number>
+export type GeoMappings = Record<string, GeoMapping>
+
+export type TOTAL_NUM_LATS = 180
+export type TOTAL_NUM_LONGS = 360

@@ -1,0 +1,1 @@
+export const nerd = 5

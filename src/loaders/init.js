@@ -6,21 +6,22 @@
 //    - x:y
 // ----------------------------------------------------
 const initUtils = require("./utils/initUtils");
-const existingImages = require('../assets/geoImages.json')
-const photoCords = require('./seedPhotoCoords.json')
+const photoCords = require('./seed/seedPhotoCoords.json')
 
-
+const OUTPUT_MAPPING_LOCATION = "assets/geoMappings.json"
+const OUTPUT_IMG_LOCATION = "assets/geoImages.json"
 const FILE_UPLOAD_LOCATIONS = [
-    './loader/utils/photos'
+    './loaders/seed/photos'
 ]
 
-// Uncomment the function you'd like to run
+
 initJSON()
 // initDB()
 
  
 function initJSON() {
-    const geoMappings = existingImages;
+    const geoMappings = {};
+    const geoImages = []
     let idx = 0;
 
     for(const path of FILE_UPLOAD_LOCATIONS) {
@@ -30,21 +31,34 @@ function initJSON() {
             const quadX = initUtils.formatNumberWithDecimal(photoCords[idx]["x"])
             const quadY = initUtils.formatNumberWithDecimal(photoCords[idx]["y"])
             const accessorKey = `${quadX}:${quadY}`
+            
+            geoImages.push({
+                id: idx,
+                x: photoCords[idx]["x"],
+                y: photoCords[idx]["y"],
+                base64Img: currImg
+            })
 
             if(geoMappings[accessorKey]) {
-                geoMappings[accessorKey].geoImages.push(currImg)
+                geoMappings[accessorKey].geoImageIDs.push(idx)
                 geoMappings[accessorKey].geoImageCount += 1
             }
             else {
                 geoMappings[accessorKey] = {
-                    geoImages: [currImg],
+                    geoImageIDs: [idx],
                     geoImageCount: 1
                 }
             }
+
+            idx += 1
         }
     }
 
-    initUtils.exportJSONToFile(JSON.stringify(geoMappings))
+    const exportReadyGeoMappings = JSON.stringify(geoMappings);
+    const exportReadyGeoImages = JSON.stringify(geoImages);
+
+    initUtils.exportJSONToFile(exportReadyGeoMappings, OUTPUT_MAPPING_LOCATION)
+    initUtils.exportJSONToFile(exportReadyGeoImages, OUTPUT_IMG_LOCATION)
 }
 
 function initDB() {
